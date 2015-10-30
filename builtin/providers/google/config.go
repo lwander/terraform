@@ -18,6 +18,7 @@ import (
 	"google.golang.org/api/container/v1"
 	"google.golang.org/api/dns/v1"
 	"google.golang.org/api/storage/v1"
+	"google.golang.org/api/pubsub/v1"
 )
 
 // Config is the configuration structure used to instantiate the Google
@@ -31,6 +32,7 @@ type Config struct {
 	clientContainer *container.Service
 	clientDns       *dns.Service
 	clientStorage   *storage.Service
+	clientPubSub    *pubsub.Service
 }
 
 func (c *Config) loadAndValidate() error {
@@ -40,6 +42,7 @@ func (c *Config) loadAndValidate() error {
 		"https://www.googleapis.com/auth/cloud-platform",
 		"https://www.googleapis.com/auth/ndev.clouddns.readwrite",
 		"https://www.googleapis.com/auth/devstorage.full_control",
+		"https://www.googleapis.com/auth/pubsub",
 	}
 
 	if c.AccountFile == "" {
@@ -148,6 +151,13 @@ func (c *Config) loadAndValidate() error {
 		return err
 	}
 	c.clientStorage.UserAgent = userAgent
+
+	log.Printf("[INFO] Instantiating Google Pub/Sub Client...")
+	c.clientPubSub, err = pubsub.New(client)
+	if err != nil {
+		return err
+	}
+	c.clientPubSub.UserAgent = userAgent
 
 	return nil
 }

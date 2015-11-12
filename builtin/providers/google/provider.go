@@ -59,6 +59,7 @@ func Provider() terraform.ResourceProvider {
 			"google_container_cluster":              resourceContainerCluster(),
 			"google_dns_managed_zone":               resourceDnsManagedZone(),
 			"google_dns_record_set":                 resourceDnsRecordSet(),
+			"google_logging_sink":                   resourceLoggingSink(),
 			"google_sql_database":                   resourceSqlDatabase(),
 			"google_sql_database_instance":          resourceSqlDatabaseInstance(),
 			"google_storage_bucket":                 resourceStorageBucket(),

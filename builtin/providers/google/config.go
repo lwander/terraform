@@ -19,6 +19,7 @@ import (
 	"google.golang.org/api/dns/v1"
 	"google.golang.org/api/sqladmin/v1beta4"
 	"google.golang.org/api/storage/v1"
+	"google.golang.org/api/logging/v1beta3"
 )
 
 // Config is the configuration structure used to instantiate the Google
@@ -33,13 +34,15 @@ type Config struct {
 	clientDns       *dns.Service
 	clientStorage   *storage.Service
 	clientSqlAdmin  *sqladmin.Service
+	clientLogging   *logging.Service
 }
 
 func (c *Config) loadAndValidate() error {
 	var account accountFile
 	clientScopes := []string{
-		"https://www.googleapis.com/auth/compute",
 		"https://www.googleapis.com/auth/cloud-platform",
+		"https://www.googleapis.com/auth/compute",
+		"https://www.googleapis.com/auth/logging.admin",
 		"https://www.googleapis.com/auth/ndev.clouddns.readwrite",
 		"https://www.googleapis.com/auth/devstorage.full_control",
 	}
@@ -157,6 +160,14 @@ func (c *Config) loadAndValidate() error {
 		return err
 	}
 	c.clientSqlAdmin.UserAgent = userAgent
+
+	log.Printf("[INFO] Instantiating Google Logging Client...")
+	c.clientLogging, err = logging.New(client)
+	if err != nil {
+		return err
+	}
+	c.clientLogging.UserAgent = userAgent
+
 
 	return nil
 }

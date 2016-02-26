@@ -79,7 +79,7 @@ func testAccComputeInstanceGroup_destroy(s *terraform.State) error {
 		}
 		_, err := config.clientCompute.InstanceGroups.Get(
 			config.Project, rs.Primary.Attributes["zone"], rs.Primary.ID).Do()
-		if err != nil {
+		if err == nil {
 			return fmt.Errorf("InstanceGroup still exists")
 		}
 	}
@@ -187,6 +187,7 @@ func testAccComputeInstanceGroup_basic(instance string) string {
 		name = "%s"
 		machine_type = "n1-standard-1"
 		can_ip_forward = false
+		zone = "us-central1-c"
 
 		disk {
 			image = "debian-7-wheezy-v20140814"
@@ -230,9 +231,11 @@ func testAccComputeInstanceGroup_basic(instance string) string {
 func testAccComputeInstanceGroup_update(instance string) string {
 	return fmt.Sprintf(`
 	resource "google_compute_instance" "ig_instance" {
-		name = "%s"
+		name = "%s-${count.index}"
 		machine_type = "n1-standard-1"
 		can_ip_forward = false
+		zone = "us-central1-c"
+		count = 1
 
 		disk {
 			image = "debian-7-wheezy-v20140814"
@@ -247,7 +250,7 @@ func testAccComputeInstanceGroup_update(instance string) string {
 		description = "Terraform test instance group"
 		name = "%s"
 		zone = "us-central1-c"
-		instances = [ "${google_compute_instance.ig_instance.*.self_link}" ]
+		instances = [ "${google_compute_instance.ig_instance.self_link}" ]
 		named_port {
 			name = "http"
 			port = "8080"
@@ -263,10 +266,11 @@ func testAccComputeInstanceGroup_update(instance string) string {
 func testAccComputeInstanceGroup_update2(instance string) string {
 	return fmt.Sprintf(`
 	resource "google_compute_instance" "ig_instance" {
-		name = "%s"
+		name = "%s-${count.index}"
 		machine_type = "n1-standard-1"
 		can_ip_forward = false
-		count = 2
+		zone = "us-central1-c"
+		count = 3
 
 		disk {
 			image = "debian-7-wheezy-v20140814"
